@@ -6,6 +6,8 @@ public class GameController : MonoBehaviour
 {
     public static GameController instance;
     public GameObject slime;
+
+    public int adultAge, elderAge;
     // Start is called before the first frame update
     void Awake()
     {
