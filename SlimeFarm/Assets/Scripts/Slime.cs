@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
@@ -21,25 +22,40 @@ public class Slime : MonoBehaviour
     public int growRate = 1;
     public int age;
     public int moveFrequence = 1;
-
+    bool stopped;
     public Transform[] reproductionPoints;
-
     NavMeshAgent agent;
+    SpriteRenderer spriteRenderer;
     private void Awake()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        spriteRenderer.sprite = GameController.instance.slimesDatabaseRegister[type];
+        agent.SetDestination(RandomPoint());
         StartCoroutine(Grow());
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(agent.remainingDistance <= agent.stoppingDistance)
+        {
+            if (!stopped)
+            {
+                print("foi");
+                stopped = true;
+                StartCoroutine(Move());
+            }
+        } else
+        {
+            spriteRenderer.flipX = agent.velocity.x < 0;
+        }
     }
     private void OnMouseDown()
     {
@@ -51,7 +67,9 @@ public class Slime : MonoBehaviour
     IEnumerator Move()
     {
         yield return new WaitForSeconds(moveFrequence);
-        
+        agent.SetDestination(RandomPoint());
+        stopped = false;
+
     }
     void Reproduce()
     {
@@ -89,19 +107,13 @@ public class Slime : MonoBehaviour
         }
         StartCoroutine(Grow());
     }
-    /*
     Vector2 RandomPoint()
     {
-        Vector3 randomPosition = Random.insideUnitSphere * 30;
-        randomPosition.y = 0;
-        randomPosition += transform.position;
-        UnityEngine.AI.NavMeshHit hit;
-        UnityEngine.AI.NavMesh.SamplePosition(randomPosition, out hit, 5, 1);
-        Vector3 finalPosition = hit.position;
-        position = finalPosition;
-        //SetRandomNavTarget();
-        //   transform.LookAt (finalPosition); 
-        Debug.Log("Movendo");
+        Vector2 randomPosition = Random.insideUnitSphere * 30;
+        randomPosition += new Vector2(transform.position.x, transform.position.y);
+        NavMeshHit hit;
+        NavMesh.SamplePosition(randomPosition, out hit, 5, 1);
+        Vector2 finalPosition = hit.position;
+        return finalPosition;
     }
-    */
 }
