@@ -26,8 +26,10 @@ public class Slime : MonoBehaviour
     public Transform[] reproductionPoints;
     NavMeshAgent agent;
     SpriteRenderer spriteRenderer;
+    Animator anim;
     private void Awake()
     {
+        anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
@@ -56,6 +58,7 @@ public class Slime : MonoBehaviour
         {
             spriteRenderer.flipX = agent.velocity.x < 0;
         }
+        anim.SetBool("isMoving", !stopped);
     }
     private void OnMouseDown()
     {
